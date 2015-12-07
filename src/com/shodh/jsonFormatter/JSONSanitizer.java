@@ -18,11 +18,11 @@ public class JSONSanitizer {
 
 	public static void main(String[] args) {		
 		try {	
-			sanitizeJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\Twitter_4\\Arabic", "Arabic.json");
-			sanitizeJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\Twitter_4\\English", "English.json");
-			sanitizeJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\Twitter_4\\French", "French.json");
-			sanitizeJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\Twitter_4\\German", "German.json");
-			sanitizeJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\Twitter_4\\Russian", "Russian.json");
+			sanitizeJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\Twitter_5\\Arabic", "Arabic.json");
+			sanitizeJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\Twitter_5\\English", "English.json");
+			sanitizeJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\Twitter_5\\French", "French.json");
+			sanitizeJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\Twitter_5\\German", "German.json");
+			sanitizeJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\Twitter_5\\Russian", "Russian.json");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -44,8 +44,8 @@ public class JSONSanitizer {
 					{
 						idList.add(((JsonObject) postsArray.get(i)).get("id").toString());
 					}
-						
-					for(int j=0; j<postsArray.size();j++)						
+					int j;
+					for(j=0; j<postsArray.size();j++)						
 					{
 						if(idList.contains(((JsonObject) postsArray.get(j)).get("retweetedID").toString()))
 						{
@@ -53,12 +53,16 @@ public class JSONSanitizer {
 							duplicatesArray.add(postsArray.get(j));
 							postsArray.remove(j);							
 						}
+						else
+						{
+							idList.add(((JsonObject) postsArray.get(j)).get("retweetedID").toString());
+						}
 					}
 		        	
 					String wikiJson = new Gson().toJson(postsArray);	
 
 
-					JSONFormatter.writeJSONToFile(wikiJson, "C:\\Users\\Abhijeet\\Desktop\\Shodh\\Sanitized_Data\\"+fileName);
+					JSONFormatter.writeJSONToFile(wikiJson, "C:\\Users\\Abhijeet\\Desktop\\Shodh\\Sanitized_Data\\Latest\\"+fileName);
 					
 		        	
 		        } catch (Exception e) {

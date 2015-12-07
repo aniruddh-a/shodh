@@ -46,13 +46,13 @@ public class JSONFormatter {
 
 	public static void main(String[] args) {
 		try {
-			getWebHoseJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\WebHose");
-			/*//getTweetJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\Arabic", "Arabic.json");
-			//getTweetJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\English", "English.json");
+			//getWebHoseJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\WebHose");
+			getTweetJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\Arabic", "Arabic.json");
+			getTweetJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\English", "English.json");
 			getTweetJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\French", "French.json");
 			getTweetJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\German", "German.json");
 			getTweetJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\Russian", "Russian.json");
-			*/
+			
 			//getWikiJSON("C:\\Users\\Abhijeet\\Desktop\\Shodh\\wikipedia", "Wiki.json");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -83,9 +83,12 @@ public class JSONFormatter {
 						WebHosePojo webHosePojo = new WebHosePojo();
 						webHosePojo.setLanguage(threadObject.get("language").toString().replaceAll("^\"|\"$", ""));
 						webHosePojo.setMain_image(((JsonObject) threadObject.get("thread")).get("main_image").toString().replaceAll("^\"|\"$", ""));
+						
+												
+						
 						webHosePojo.setOrganizations_mentioned(gson.fromJson(threadObject.get("organizations").toString(), List.class));
 						webHosePojo.setPersons_mentioned(gson.fromJson(threadObject.get("persons").toString(), List.class));
-						webHosePojo.setPlaces_mentioned(gson.fromJson(threadObject.get("persons").toString(), List.class));
+						webHosePojo.setPlaces_mentioned(gson.fromJson(threadObject.get("locations").toString(), List.class));
 						webHosePojo.setPerformance_score(Integer.parseInt(((JsonObject) threadObject.get("thread")).get("performance_score").toString()));
 													
 						SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
@@ -169,12 +172,10 @@ public class JSONFormatter {
 						ArrayList hashTagList = new ArrayList();
 						for(int j=0; j<hashTagArray.size(); j++)
 						{					
-							HashTagEntities hashtags = new HashTagEntities();
-							hashtags.setText(((JsonObject) hashTagArray.get(j)).get("text").toString().replaceAll("^\"|\"$", ""));
-							hashTagList.add(hashtags);
+							hashTagList.add(((JsonObject) hashTagArray.get(j)).get("text").toString().replaceAll("^\"|\"$", ""));
 						}
 
-						tweetPojo.setHashtags(gson.toJson(hashTagList));
+						tweetPojo.setHashtags(hashTagList);
 						
 						tweetPojo.setId(((JsonObject) postsArray.get(i)).get("id").toString().replaceAll("^\"|\"$", ""));
 						tweetPojo.setLanguage(((JsonObject) postsArray.get(i)).get("lang").toString().replaceAll("^\"|\"$", ""));
@@ -189,31 +190,26 @@ public class JSONFormatter {
 							ArrayList placesList = new ArrayList<>();
 							for(int j=0; j<mapOfAll.get("person").size(); j++)
 							{	
-								PersonsMentioned person = new PersonsMentioned();
-								person.setPerson(mapOfAll.get("person").get(j).toString().replaceAll("^\"|\"$", ""));
-								personList.add(person);
+								personList.add(mapOfAll.get("person").get(j).toString().replaceAll("^\"|\"$", ""));
 							}
 							for(int j=0; j<mapOfAll.get("location").size(); j++)
 							{	
-								PlacesMentioned place = new PlacesMentioned();
-								place.setPlaces(mapOfAll.get("location").get(j).toString().replaceAll("^\"|\"$", ""));
-								personList.add(place);
+								placesList.add(mapOfAll.get("location").get(j).toString().replaceAll("^\"|\"$", ""));
 							}
 							for(int j=0; j<mapOfAll.get("organization").size(); j++)
 							{	
-								OrganizationsMentioned org = new OrganizationsMentioned();
-								org.setOrganization(mapOfAll.get("organization").get(j).toString().replaceAll("^\"|\"$", ""));
-								orgList.add(org);
+								orgList.add(mapOfAll.get("organization").get(j).toString().replaceAll("^\"|\"$", ""));
 							}
-							tweetPojo.setPersons_mentioned(gson.toJson(personList));
-							tweetPojo.setOrganizations_mentioned(gson.toJson(placesList));							
-							tweetPojo.setPlaces_mentioned(gson.toJson(orgList));
+							tweetPojo.setPersons_mentioned(personList);
+							tweetPojo.setOrganizations_mentioned(orgList);							
+							tweetPojo.setPlaces_mentioned(placesList);
 						}
 						else
 						{							
-							tweetPojo.setOrganizations_mentioned("");
-							tweetPojo.setPersons_mentioned("");
-							tweetPojo.setPlaces_mentioned("");
+							List emptyList = new ArrayList<>();
+							tweetPojo.setOrganizations_mentioned(emptyList);
+							tweetPojo.setPersons_mentioned(emptyList);
+							tweetPojo.setPlaces_mentioned(emptyList);
 						}
 						tweetPojo.setProfileImageURL(((JsonObject) ((JsonObject) postsArray.get(i)).get("user")).get("profileImageUrlHttps").toString().replaceAll("^\"|\"$", ""));
 						tweetPojo.setRetweeted(((JsonObject) postsArray.get(i)).get("isRetweeted").getAsBoolean());
@@ -248,13 +244,11 @@ public class JSONFormatter {
 						JsonArray urlArray = (JsonArray) ((JsonObject) postsArray.get(i)).get("urlEntities");						
 						ArrayList urlList = new ArrayList();
 						for(int j=0; j<urlArray.size(); j++)
-						{					
-							URLEnitities url = new URLEnitities();
-							url.setUrl(((JsonObject) urlArray.get(j)).get("expandedURL").toString().replaceAll("^\"|\"$", ""));
-							urlList.add(url);
+						{		
+							urlList.add(((JsonObject) urlArray.get(j)).get("expandedURL").toString().replaceAll("^\"|\"$", ""));
 						}
-						String urlJson = gson.toJson(urlList, ArrayList.class);
-						tweetPojo.setUrl(urlJson);
+						
+						tweetPojo.setUrl(urlList);
 						
 						tweetPojo.setUser_id(((JsonObject) ((JsonObject) postsArray.get(i)).get("user")).get("id").toString().replaceAll("^\"|\"$", ""));
 						
@@ -263,11 +257,9 @@ public class JSONFormatter {
 						ArrayList mentionsList = new ArrayList();
 						for(int j=0; j<mentionsArray.size(); j++)
 						{					
-							UserMentions userMentions = new UserMentions();
-							userMentions.setUserMentions(((JsonObject) mentionsArray.get(j)).get("screenName").toString().replaceAll("^\"|\"$", ""));
-							mentionsList.add(userMentions);
+							mentionsList.add(((JsonObject) mentionsArray.get(j)).get("screenName").toString().replaceAll("^\"|\"$", ""));
 						}
-						tweetPojo.setUser_mentions(gson.toJson(mentionsList));
+						tweetPojo.setUser_mentions(mentionsList);
 						
 						tweetPojo.setUser_name(((JsonObject) ((JsonObject) postsArray.get(i)).get("user")).get("screenName").toString().replaceAll("^\"|\"$", ""));
 						tweetPojo.setVerified(((JsonObject) ((JsonObject) postsArray.get(i)).get("user")).get("isVerified").getAsBoolean());
@@ -294,7 +286,7 @@ public class JSONFormatter {
 		String tweetJson = new Gson().toJson(tweetPojoList);	
 		
 		
-		writeJSONToFile(tweetJson, "C:\\Users\\Abhijeet\\Desktop\\Shodh\\Twitter_4\\"+fileName);
+		writeJSONToFile(tweetJson, "C:\\Users\\Abhijeet\\Desktop\\Shodh\\Twitter_5\\"+fileName);
 	}
 	
 	

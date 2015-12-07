@@ -18,9 +18,9 @@ public class TweetPojo {
 	private String language;
 	private boolean retweeted;
 	private boolean sensitive;
-	private String user_mentions;
-	private String url;
-	private String hashtags;
+	private List<String> user_mentions;
+	private List<String> url;
+	private List<String> hashtags;
 	private String user_id;
 	
 	/*User information starts*/
@@ -30,9 +30,9 @@ public class TweetPojo {
 	private String geo_co_ordinates; 
 	/*User information ends*/
 	
-	private String persons_mentioned;
-	private String organizations_mentioned;
-	private String places_mentioned;
+	private List<String> persons_mentioned;
+	private List<String> organizations_mentioned;
+	private List<String> places_mentioned;
 	private String retweetedID;
 	
 	
@@ -104,22 +104,26 @@ public class TweetPojo {
 	public void setSensitive(boolean sensitive) {
 		this.sensitive = sensitive;
 	}
-	public String getUser_mentions() {
+	
+	
+	
+	
+	public List<String> getUser_mentions() {
 		return user_mentions;
 	}
-	public void setUser_mentions(String user_mentions) {
+	public void setUser_mentions(List<String> user_mentions) {
 		this.user_mentions = user_mentions;
 	}
-	public String getUrl() {
+	public List<String> getUrl() {
 		return url;
 	}
-	public void setUrl(String url) {
+	public void setUrl(List<String> url) {
 		this.url = url;
 	}
-	public String getHashtags() {
+	public List<String> getHashtags() {
 		return hashtags;
 	}
-	public void setHashtags(String hashtags) {
+	public void setHashtags(List<String> hashtags) {
 		this.hashtags = hashtags;
 	}
 	public String getUser_id() {
@@ -152,23 +156,25 @@ public class TweetPojo {
 	public void setGeo_co_ordinates(String geo_co_ordinates) {
 		this.geo_co_ordinates = geo_co_ordinates;
 	}
-	public String getPersons_mentioned() {
+	public List<String> getPersons_mentioned() {
 		return persons_mentioned;
 	}
-	public void setPersons_mentioned(String persons_mentioned) {
+	public void setPersons_mentioned(List<String> persons_mentioned) {
 		this.persons_mentioned = persons_mentioned;
 	}
-	public String getOrganizations_mentioned() {
+	public List<String> getOrganizations_mentioned() {
 		return organizations_mentioned;
 	}
-	public void setOrganizations_mentioned(String organizations_mentioned) {
+	public void setOrganizations_mentioned(List<String> organizations_mentioned) {
 		this.organizations_mentioned = organizations_mentioned;
 	}
-	public String getPlaces_mentioned() {
+	public List<String> getPlaces_mentioned() {
 		return places_mentioned;
 	}
-	public void setPlaces_mentioned(String places_mentioned) {
+	public void setPlaces_mentioned(List<String> places_mentioned) {
 		this.places_mentioned = places_mentioned;
 	}
+	
+	
 	
 }

@@ -59,11 +59,11 @@ public class ShodhCrawler {
 			List tweetList = new ArrayList<>();
 			Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 			//FileWriter file = new FileWriter("C:\\Users\\Abhijeet\\Desktop\\Twitter_API\\JSON_Data\\data_ru.json", true);
-			Writer file_en = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\data_en_d5.json"), "UTF8"));
-			Writer file_ru = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\data_ru_d5.json"), "UTF8"));	
-			Writer file_de = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\data_de_d5.json"), "UTF8"));
-			Writer file_fr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\data_fr_d5.json"), "UTF8"));
-			Writer file_ar = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\data_ar_d5.json"), "UTF8"));
+			//Writer file_en = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\data_en_d5.json"), "UTF8"));
+			//Writer file_ru = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\data_ru_d5.json"), "UTF8"));	
+			Writer file_de = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\data_de_d6.json"), "UTF8"));
+			//Writer file_fr = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\data_fr_d5.json"), "UTF8"));
+			//Writer file_ar = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:\\Users\\Abhijeet\\Desktop\\Shodh\\JSON_Data\\data_ar_d5.json"), "UTF8"));
 			SimpleDateFormat dateFmt = new SimpleDateFormat("YYYY-MM-dd'T'hh:mm:ss'Z'");
 	
 			StatusListener listener = new StatusListener()
@@ -73,18 +73,18 @@ public class ShodhCrawler {
 		    			
 		    		
 					try {
-						if("en".equalsIgnoreCase(status.getLang()))						
+						/*if("en".equalsIgnoreCase(status.getLang()))						
 						{
 							
 							file_en.write("\n,");							
 							file_en.write(gson.toJson(status).toString());
 						}
-						else if("de".equalsIgnoreCase(status.getLang()))						
+						else*/ if("de".equalsIgnoreCase(status.getLang()))						
 						{
 							file_de.write("\n,");
 							file_de.write(gson.toJson(status).toString());
 						}
-						else if("ru".equalsIgnoreCase(status.getLang()))						
+						/*else if("ru".equalsIgnoreCase(status.getLang()))						
 						{
 							file_ru.write("\n,");
 							file_ru.write(gson.toJson(status).toString());
@@ -98,7 +98,7 @@ public class ShodhCrawler {
 						{
 							file_fr.write("\n,");
 							file_fr.write(gson.toJson(status).toString());
-						}
+						}*/
 						
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
@@ -129,12 +129,12 @@ public class ShodhCrawler {
 				}
 		    };
 	    
-		    String keywords[] = {"Pray for Paris", "Syria", "Russia", "PrayForParis", "ISIS",	//English
+		    String keywords[] = {/*"Pray for Paris", "Syria", "Russia", "PrayForParis", "ISIS",	//English
 		    						"Prier pour Paris", "Syrie", "Russie",						//French 
-		    								"نصلي لباريس", "سوريا", "روسيا",								//Arabic
+		    								"نصلي لباريس", "سوريا", "روسيا",					*/			//Arabic
 		    								"Beten Sie für Paris", "Syrien", "Russland",		//German 
-		    									"Молитесь в Париж", "Сирия", "Россия"};			//Russian
-		    String language[] = {"en", "ru", "de", "ar", "fr"};
+		    									/*"Молитесь в Париж", "Сирия", "Россия"*/};			//Russian
+		    String language[] = {"de"};
 		   
 		    FilterQuery fq = new FilterQuery(0, null, keywords, null, language);
 		    //fq.filterLevel("medium");		    
