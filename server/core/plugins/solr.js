@@ -6,7 +6,13 @@ var solrConfig = config.get('solr');
 var solr = function(provider, query, callback){
 	var config;
 	if(provider == "twitter")
-		config = solrConfig.get('twitter').get('nodeConfig');
+		config = solrConfig.get("twitter").get("nodeConfig");
+
+	if(provider == "webhose")
+		config = solrConfig.get("webhose").get("nodeConfig");
+
+	// if(provider == "blog")
+	// 	config = solrConfig.get("webhose").get("nodeConfig");
 
 	var url = "http://" + config.host + ":" + config.port + "/solr/" +config.coreName + "/select?q=" + query + "&wt=json";
 	console.log(url);

@@ -7423,7 +7423,7 @@
         $locationProvider.html5Mode(false);
 
         // defaults to dashboard
-        $urlRouterProvider.otherwise('/app/dashboard');
+        $urlRouterProvider.otherwise('/app/search');
 
         //
         // Application Routes
@@ -9805,22 +9805,35 @@
         .module('app.search')
         .controller('SearchController', SearchController);
 
-    SearchController.$inject = ['$scope', 'ChartData', '$timeout','$http'];
-    function SearchController($scope, ChartData, $timeout, $http) {
+    SearchController.$inject = ['$scope', 'ChartData', '$timeout','$http','$window' ];
+    function SearchController($scope, ChartData, $timeout, $http, $window ) {
       console.log('inside search controller');
         var vm = this;
         var filterDefaultOptions = {
           dataSources: {
             twitter: false,
             news: false,
-            blog: false
-          },
+            blog: false,
+            languages: {
+              en: false,
+              fr: false,
+              de: false,
+              ru: false,
+              ar: false
+            }
+          }
+          ,
           mentionedEntities: {
-            people: false,
-            orgnizations: false,
-            places: false
+            persons_mentioned_f: true,
+            organizations_mentioned_f: true,
+            places_mentioned_f: true
+          },
+          dateRange: {
+            isRange: false,
+            range: []
           }
         };
+
         $scope.filter = {};
         $scope.searchText = "";
         $scope.isAdvancedSearchPanelVisible = false;
@@ -9828,29 +9841,240 @@
 
         console.log(JSON.stringify($scope.filter));
 
-        // activate();
+        $scope.clickResult = function(result){
 
-        // ////////////////
+          for(var count = 0; count < $scope.searchResults.length; ++count){
+            if($scope.searchResults[count].id == result.id){
+              $scope.searchResults[count].showFull = true;
+              // $scope.$apply();
+              break;
+            }
+          }
 
-        // function activate() {
+        }
 
+        $scope.getClassName = function(source){
+          var className = "fa";
+          if(source == "twitter")
+            className += " fa-twitter"
 
-        // }
+          if(source == "blog")
+            className += " fa-newspaper-o";
+
+          if(source == "news")
+            className += " fa-pencil-square";
+
+          return className;
+        }
 
         $scope.search = function(){
           console.log('now call search api');
-          console.log(JSON.stringify($scope.filter));
-          //TODO validations
+          
+          console.log('dates are ' + vm.dt1 + "  " + vm.dt2);
 
-          $http.post('/someUrl', data, config).then(function(){
-            //populat data here
-          }, function(){
+          //remove hours and minutes from date
+          var startDate = vm.dt1;
+          startDate.setHours(0);
+          startDate.setMinutes(0);
+          startDate.setSeconds(0)
+
+          var endDate = vm.dt2;
+          endDate.setHours(0);
+          endDate.setMinutes(0);
+          endDate.setSeconds(0)
+
+          var range= [];
+          startDate = startDate.toISOString().split('.')[0]+"Z";
+          endDate = endDate.toISOString().split('.')[0]+"Z";
+
+          range.push(startDate);
+          range.push(endDate);
+
+          $scope.filter.dateRange.range = range;
+
+          var languages = [];
+
+          Object.keys($scope.filter.dataSources.languages).forEach(function(key, val){
+            
+            if($scope.filter.dataSources.languages[key] )
+              languages.push(key);
+          });
+
+          var providers = [];
+
+          Object.keys($scope.filter.dataSources).forEach(function(key, val){
+            console.log(key);
+            console.log($scope.filter.dataSources[key]);
+            if($scope.filter.dataSources[key] & key != "languages")
+              providers.push(key);
+          });
+
+
+          var sendToServer = {};
+          
+          angular.copy($scope.filter, sendToServer);
+
+          sendToServer.languages = languages;
+          sendToServer.providers = providers;
+          sendToServer.text = $scope.searchText;
+          console.log('-----------------------');
+          
+          console.log(JSON.stringify(sendToServer));
+
+          console.log('-----------------------');
+          // return;
+          //TODO validations
+          if(providers.length == 0 || languages.length == 0 || $scope.searchText == "")
+          {
+            alert("Please select at least one provider and language");
+            return;
+          }
+
+          $scope.searchResults = [];
+          var tempSearchResults = [];
+
+          function sortByScore(a, b){
+            if(a.score > b.score)
+              return -1;
+            if(a.score < b.score)
+              return 1;
+            return 0;           
+          }          
+
+          // $http.get('http://localhost:8000/data.json').then(function(response){
+            $http.post('http://192.168.0.9:3000/query', sendToServer).then(function(response){
+            // var data = response.data;
+            response.data.forEach(function(data){
+              if(data.error) return;
+              Object.keys(data.grouped).forEach( function( key ){
+              var val = data.grouped[key];
+              // var obj = {
+              //   key : key,
+              //   list : val["groups"]
+              // };
+
+              // val["groups"].forEach
+              val["groups"].forEach(function(group){
+                var groupName = group.groupValue;
+                group.doclist.docs.forEach(function(doc){
+                  doc.__groupName = groupName;
+                  
+                  if(doc.hashtags)
+                    doc.source = "twitter";
+                  if(doc.site_type)
+                    if(doc.site_type == "news")
+                    doc.source = "news";
+                  if(doc.site_type)
+                    if(doc.site_type == "blogs")
+                      doc.source = "blog";
+
+                  if(doc.source == "twitter"){
+                    var hashtags = [];
+                    doc.hashtags.forEach(function(tag){
+                      tag = "#"+tag;
+                      hashtags.push(tag);
+                    });
+                    doc.hashtags = hashtags;
+
+                  }
+                  console.log('pushing');
+                  var date = new Date(doc.timestamp);
+                  doc.createdAt = date.toGMTString();
+                  doc.showFull = false;                  
+                  tempSearchResults.push(doc);
+                })
+              });
+
+              tempSearchResults.sort(sortByScore);
+              angular.copy(tempSearchResults, $scope.searchResults);
+
+              // <!-- $scope.searchResults[0].list[0].doclist.docs -->
+              // $scope.searchResults.push(obj);
+              // console.log(key);
+              // console.log(val); 
+            });
+
+            console.log(" $scope.searchResults length " + $scope.searchResults.length);
+            })
+            console.log('got data');
+            // $scope.searchResults = data.grouped;
+
+            
 
           });
-        }
+
+          // $http.post('http://localhost:3000/query', sendToServer).then(function(data){
+          //   console.log(data);
+          //   //populate data here
+          // }, function(err, status){
+          //   console.log('error ' + err);
+          // });
+
+        } //search ends here
 
         $scope.toggleAdvancedPanel = function() {
           $scope.isAdvancedSearchPanelVisible = ! $scope.isAdvancedSearchPanelVisible; 
-        }       
+        }
+
+        $scope.addTagToSearchBox = function(tag){
+          tag = tag.substring(1, tag.length);
+          $scope.searchText += " " + tag;
+        }
+
+        activate();
+        // $scope.search();
+
+        ////////////////
+
+        function activate() {
+          vm.today = function() {
+            vm.dt1 = new Date();
+            vm.dt2 = new Date();
+          };
+
+          vm.today();
+
+          vm.clear = function () {
+            vm.dt1 = null;
+            vm.dt2 = null;
+          };
+
+          // Disable weekend selection
+          vm.disabled1 = function(date, mode) {
+            // return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
+          };
+
+          vm.disabled2 = function(date, mode) {
+            // return ( mode === 'day' && ( date.getDay() === 0 || date.getDay() === 6 ) );
+          };
+
+          vm.toggleMin = function() {
+            vm.minDate = vm.minDate ? null : new Date();
+          };
+          vm.toggleMin();
+
+          vm.open1 = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+
+            vm.opened1 = true;
+          };
+
+          vm.open2 = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+
+            vm.opened2 = true;
+          };
+
+          vm.dateOptions = {
+            formatYear: 'yy',
+            startingDay: 1
+          };
+
+          vm.initDate = new Date('2019-10-20');
+          vm.formats = ['dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+          vm.format = vm.formats[0];
+        }
     }
 })();
